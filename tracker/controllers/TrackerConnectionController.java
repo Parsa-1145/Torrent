@@ -19,7 +19,9 @@ public class TrackerConnectionController {
 		try {
 			Message response = connection.sendAndWaitForResponse(request, TIMEOUT_MILLIS);
 
-            return response.getFromBody("received_files");
+			Map<String, List<String>> receivedFiles = response.getFromBody("received_files");
+
+			return receivedFiles == null ? new HashMap<>() : receivedFiles;
 		} catch (Exception e) {
 			System.err.println("Request Timed out.");
 			return new HashMap<>();
@@ -32,7 +34,8 @@ public class TrackerConnectionController {
 		try {
 			Message response = connection.sendAndWaitForResponse(request, TIMEOUT_MILLIS);
 
-            return response.getFromBody("sent_files");
+			Map<String, List<String>> sentFiles = response.getFromBody("sent_files");
+			return sentFiles == null ? new HashMap<>() : sentFiles;
 		} catch (Exception e) {
 			System.err.println("Request Timed out.");
 			return new HashMap<>();

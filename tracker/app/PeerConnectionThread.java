@@ -32,6 +32,7 @@ public class PeerConnectionThread extends ConnectionThread {
 			fileAndHashes = fileResponse.getFromBody("files");
 
 			TrackerApp.addPeerConnection(this);
+
 			return true;
 		} catch (Exception e) {
 			return false;

@@ -38,7 +38,7 @@ public class TorrentP2PThread extends Thread {
 
 			PeerApp.addSentFile(receiver, file.getName() + " " + md5);
 		} catch (IOException e) {
-			System.err.println("Error while sending file: " + e.getMessage());
+//			System.err.println("Error while sending file: " + e.getMessage());
 		} finally {
 			try {
 				dataOutputStream.close();

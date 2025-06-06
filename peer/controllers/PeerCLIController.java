@@ -54,7 +54,7 @@ public class PeerCLIController {
 				return "The file has been downloaded from peer but is corrupted!";
 			}
 
-			return "File downloaded successfully: ";
+			return "File downloaded successfully: " + fileName;
 		} catch (Exception e){
 			System.err.println("Request Timed out.");
 			return "";

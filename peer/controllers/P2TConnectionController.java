@@ -8,22 +8,17 @@ import static peer.app.PeerApp.TIMEOUT_MILLIS;
 
 public class P2TConnectionController {
 	public static Message handleCommand(Message message) {
-		switch ((String) message.getFromBody("command")){
-			case "status" ->{
-				return status();
-			}
-			case "get_files_list" -> {
-				return getFilesList();
-			}
-			case "get_sends" -> {
-				return getSends();
-			}
-			case "get_receives" -> {
-				return getReceives();
-			}
-			default -> {
-				return null;
-			}
+		String command = (String) message.getFromBody("command");
+		if ("status".equals(command)) {
+			return status();
+		} else if ("get_files_list".equals(command)) {
+			return getFilesList();
+		} else if ("get_sends".equals(command)) {
+			return getSends();
+		} else if ("get_receives".equals(command)) {
+			return getReceives();
+		} else {
+			return null;
 		}
 	}
 

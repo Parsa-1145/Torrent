@@ -1,5 +1,6 @@
 package tracker.controllers;
 
+import common.models.CLICommands;
 import common.models.ConnectionThread;
 import common.utils.FileUtils;
 import tracker.app.PeerConnectionThread;
@@ -27,7 +28,7 @@ public class TrackerCLIController {
 			return getReceives(matcher.group("ip"), Integer.parseInt(matcher.group("port")));
 		}
 
-		return null;
+		return CLICommands.invalidCommand;
 	}
 
 	private static String getReceives(String ip, int port) {
@@ -49,11 +50,11 @@ public class TrackerCLIController {
 			}
 		}
 
-		flattenedList.sort(Comparator.comparing(Map.Entry<String, String>::getValue).thenComparing(Map.Entry<String, String>::getValue));
+		flattenedList.sort(Comparator.comparing(Map.Entry<String, String>::getKey).thenComparing(Map.Entry<String, String>::getValue));
 
 		StringBuilder out = new StringBuilder();
 		for (Map.Entry<String, String> entry : flattenedList) {
-			out.append(entry.getValue()).append(" - ").append(entry.getKey()).append("\n");
+			out.append(entry.getKey()).append(" - ").append(entry.getValue()).append("\n");
 		}
 		out.deleteCharAt(out.length()-1);
 
@@ -79,11 +80,11 @@ public class TrackerCLIController {
 			}
 		}
 
-		flattenedList.sort(Comparator.comparing(Map.Entry<String, String>::getValue).thenComparing(Map.Entry<String, String>::getValue));
+		flattenedList.sort(Comparator.comparing(Map.Entry<String, String>::getKey).thenComparing(Map.Entry<String, String>::getValue));
 
 		StringBuilder out = new StringBuilder();
 		for (Map.Entry<String, String> entry : flattenedList) {
-			out.append(entry.getValue()).append(" - ").append(entry.getKey()).append("\n");
+			out.append(entry.getKey()).append(" - ").append(entry.getValue()).append("\n");
 		}
 		out.deleteCharAt(out.length()-1);
 

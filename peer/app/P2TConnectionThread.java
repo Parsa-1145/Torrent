@@ -20,6 +20,7 @@ public class P2TConnectionThread extends ConnectionThread {
 		try {
 			socket.setSoTimeout(TIMEOUT_MILLIS);
 
+			dataInputStream.readUTF();
 			Message message1 = P2TConnectionController.status();
 			sendMessage(message1);
 
