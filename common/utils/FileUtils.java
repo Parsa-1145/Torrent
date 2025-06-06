@@ -42,4 +42,22 @@ public class FileUtils {
 
 		return result.toString();
 	}
+
+	public static File getFileByName(String folderPath, String fileName) {
+		File folder = new File(folderPath);
+		if (!folder.exists() || !folder.isDirectory()) {
+			throw new IllegalArgumentException("Provided path is not a valid folder: " + folderPath);
+		}
+
+		File[] files = folder.listFiles();
+		if (files == null) return null;
+
+		for (File file : files) {
+			if (file.isFile() && file.getName().equals(fileName)) {
+				return file;
+			}
+		}
+
+		return null;
+	}
 }

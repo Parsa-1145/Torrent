@@ -1,10 +1,11 @@
 package tracker.controllers;
 
+import common.models.ConnectionThread;
 import common.utils.FileUtils;
 import tracker.app.PeerConnectionThread;
 import tracker.app.TrackerApp;
 
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 
 public class TrackerCLIController {
@@ -16,19 +17,77 @@ public class TrackerCLIController {
 			return endProgram();
 		} else if((matcher = TrackerCommands.LIST_FILES.getMatcher(command)).matches()){
 			return listFiles(matcher.group("ip"), Integer.parseInt(matcher.group("port")));
+		} else if((matcher = TrackerCommands.REFRESH_FILES.getMatcher(command)).matches()){
+			return refreshFiles();
+		} else if((matcher = TrackerCommands.RESET_CONNECTIONS.getMatcher(command)).matches()){
+			return resetConnections();
+		} else if((matcher = TrackerCommands.GET_SENDS.getMatcher(command)).matches()){
+			return getSends(matcher.group("ip"), Integer.parseInt(matcher.group("port")));
+		} else if((matcher = TrackerCommands.GET_RECEIVES.getMatcher(command)).matches()){
+			return getReceives(matcher.group("ip"), Integer.parseInt(matcher.group("port")));
 		}
 
 		return null;
 	}
 
-	private static String getReceives(String command) {
-		// TODO: Get list of files received by a peer
-		throw new UnsupportedOperationException("getReceives not implemented yet");
+	private static String getReceives(String ip, int port) {
+		PeerConnectionThread connection = TrackerApp.getConnectionByIpPort(ip, port);
+		if(connection == null){
+			return "Peer not found.";
+		}
+		Map<String, List<String>> receives = TrackerConnectionController.getReceives(connection);
+
+		if(receives.isEmpty()){
+			return "No files received by " + ip + ":" + port;
+		}
+
+		List<Map.Entry<String, String>> flattenedList = new ArrayList<>();
+		for (Map.Entry<String, List<String>> entry : receives.entrySet()) {
+			String ipPort = entry.getKey();
+			for (String fileMd5 : entry.getValue()) {
+				flattenedList.add(new AbstractMap.SimpleEntry<>(fileMd5, ipPort));
+			}
+		}
+
+		flattenedList.sort(Comparator.comparing(Map.Entry<String, String>::getValue).thenComparing(Map.Entry<String, String>::getValue));
+
+		StringBuilder out = new StringBuilder();
+		for (Map.Entry<String, String> entry : flattenedList) {
+			out.append(entry.getValue()).append(" - ").append(entry.getKey()).append("\n");
+		}
+		out.deleteCharAt(out.length()-1);
+
+		return out.toString();
 	}
 
-	private static String getSends(String command) {
-		// TODO: Get list of files sent by a peer
-		throw new UnsupportedOperationException("getSends not implemented yet");
+	private static String getSends(String ip, int port) {
+		PeerConnectionThread connection = TrackerApp.getConnectionByIpPort(ip, port);
+		if(connection == null){
+			return "Peer not found.";
+		}
+		Map<String, List<String>> sends = TrackerConnectionController.getSends(connection);
+
+		if(sends.isEmpty()){
+			return "No files sent by " + ip + ":" + port;
+		}
+
+		List<Map.Entry<String, String>> flattenedList = new ArrayList<>();
+		for (Map.Entry<String, List<String>> entry : sends.entrySet()) {
+			String ipPort = entry.getKey();
+			for (String fileMd5 : entry.getValue()) {
+				flattenedList.add(new AbstractMap.SimpleEntry<>(fileMd5, ipPort));
+			}
+		}
+
+		flattenedList.sort(Comparator.comparing(Map.Entry<String, String>::getValue).thenComparing(Map.Entry<String, String>::getValue));
+
+		StringBuilder out = new StringBuilder();
+		for (Map.Entry<String, String> entry : flattenedList) {
+			out.append(entry.getValue()).append(" - ").append(entry.getKey()).append("\n");
+		}
+		out.deleteCharAt(out.length()-1);
+
+		return out.toString();
 	}
 
 	private static String listFiles(String ip, int port) {
@@ -63,14 +122,21 @@ public class TrackerCLIController {
 	}
 
 	private static String resetConnections() {
-		// TODO: Reset all peer connections
-		// Refresh status and file list for each peer
-		throw new UnsupportedOperationException("resetConnections not implemented yet");
+		for (int i = TrackerApp.getConnections().size() - 1; i >= 0; i--) {
+			PeerConnectionThread connection = TrackerApp.getConnections().get(i);
+			connection.refreshStatus();
+		}
+
+		refreshFiles();
+		return "";
 	}
 
 	private static String refreshFiles() {
-		// TODO: Refresh file lists for all peers
-		throw new UnsupportedOperationException("refreshFiles not implemented yet");
+		for (int i = TrackerApp.getConnections().size() - 1; i >= 0; i--) {
+			TrackerApp.getConnections().get(i).refreshFileList();
+		}
+
+		return "";
 	}
 
 	private static String endProgram() {

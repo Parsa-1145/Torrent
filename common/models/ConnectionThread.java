@@ -39,9 +39,7 @@ abstract public class ConnectionThread extends Thread {
 			socket.setSoTimeout(0);
 			return result;
 		} catch (Exception e) {
-			System.out.println(e);
-			System.out.println(Arrays.toString(e.getStackTrace()));
-//			System.err.println("Request Timed out. (message : " + message.toString() +")");
+			System.err.println("Request Timed out.");
 			return null;
 		}
 	}

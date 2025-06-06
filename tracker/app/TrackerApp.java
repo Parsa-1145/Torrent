@@ -43,7 +43,7 @@ public class TrackerApp {
 		for (PeerConnectionThread connection : connections)
 			connection.end();
 		connections.clear();
-
+		listenerThread.end();
 	}
 
 	public static void removePeerConnection(PeerConnectionThread peerConnectionThread) {

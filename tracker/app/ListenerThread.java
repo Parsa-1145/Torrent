@@ -3,6 +3,7 @@ package tracker.app;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class ListenerThread extends Thread {
 	private final ServerSocket serverSocket;
@@ -25,13 +26,24 @@ public class ListenerThread extends Thread {
 		while (!TrackerApp.isEnded()) {
 			try {
 				Socket socket = serverSocket.accept();
-				System.out.println(socket);
 				handleConnection(socket);
+			} catch (SocketException e) {
+				break;
 			} catch (Exception e) {
+				e.printStackTrace(); // Log other exceptions
 				break;
 			}
 		}
 
-		try {serverSocket.close();} catch (Exception ignored) {}
+		try {
+			serverSocket.close();
+		} catch (Exception ignored) {}
+	}
+
+	public void end(){
+		try {
+			serverSocket.close();
+		} catch (IOException e) {
+		}
 	}
 }

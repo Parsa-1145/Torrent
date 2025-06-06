@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 public enum PeerCommands implements CLICommands {
 	END("exit"),
+	DOWNLOAD("^\\s*download\\s*(?<name>\\S+.*\\S+)\\s*$"),
 	LIST("^\\s*list\\s*$");
 	// TODO: Implement regex for each command
 

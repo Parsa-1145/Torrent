@@ -19,7 +19,7 @@ public class PeerMain {
 		try {
 			PeerApp.initFromArgs(args);
 			PeerApp.connectTracker();
-//			PeerApp.startListening();
+			PeerApp.startListening();
 		} catch (Exception e) {
 			System.err.println("Error initializing peer: " + e.getMessage());
 			System.err.println(Arrays.toString(e.getStackTrace()));

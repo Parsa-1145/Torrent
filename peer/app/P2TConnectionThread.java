@@ -15,14 +15,12 @@ public class P2TConnectionThread extends ConnectionThread {
 		super(socket);
 	}
 
-	@Override
+		@Override
 	public boolean initialHandshake() {
 		try {
 			socket.setSoTimeout(TIMEOUT_MILLIS);
 
-			System.out.println(dataInputStream.readUTF());
 			Message message1 = P2TConnectionController.status();
-			System.out.println(message1);
 			sendMessage(message1);
 
 			dataInputStream.readUTF();

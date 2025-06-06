@@ -27,34 +27,49 @@ public class PeerConnectionThread extends ConnectionThread {
 			setOtherSideIP(addressResponse.getFromBody("peer"));
 			setOtherSidePort(addressResponse.getIntFromBody("listen_port"));
 
-			Message fileResponse = sendAndWaitForResponse(new Message(Map.of("command", "status"), Message.Type.command), TIMEOUT_MILLIS);
+			Message fileResponse = sendAndWaitForResponse(new Message(Map.of("command", "get_files_list"), Message.Type.command), TIMEOUT_MILLIS);
 			if(fileResponse == null) return false;
 			fileAndHashes = fileResponse.getFromBody("files");
 
 			TrackerApp.addPeerConnection(this);
 			return true;
 		} catch (Exception e) {
-			System.out.println(e);
 			return false;
 		}
 	}
 
 	public void refreshStatus() {
-		Message addressResponse = sendAndWaitForResponse(new Message(Map.of("command", "status"), Message.Type.command), 1000);
+		Message addressResponse;
+		try {
+			addressResponse = sendAndWaitForResponse(new Message(Map.of("command", "status"), Message.Type.command), 1000);
+			if(addressResponse == null){
+				TrackerApp.removePeerConnection(this);
+				return;
+			}
+		} catch (Exception e) {
+			TrackerApp.removePeerConnection(this);
+			return;
+		}
 		setOtherSideIP(addressResponse.getFromBody("peer"));
 		setOtherSidePort(addressResponse.getIntFromBody("listen_port"));
 	}
 
 	public void refreshFileList() {
-		Message fileResponse = sendAndWaitForResponse(new Message(Map.of("command", "status"), Message.Type.command), TIMEOUT_MILLIS);
-		fileAndHashes = fileResponse.getFromBody("files");
+		Message fileResponse;
+		try {
+			fileResponse = sendAndWaitForResponse(new Message(Map.of("command", "get_files_list"), Message.Type.command), TIMEOUT_MILLIS);
+		} catch (Exception e) {
+			TrackerApp.removePeerConnection(this);
+			return;
+		}
 
+		fileAndHashes = fileResponse.getFromBody("files");
 	}
 
 	@Override
 	protected boolean handleMessage(Message message) {
 		if (message.getType() == Message.Type.file_request) {
-			sendMessage(TrackerConnectionController.handleCommand(message));
+			sendMessage(TrackerConnectionController.fileRequest(message));
 			return true;
 		}
 		return false;
